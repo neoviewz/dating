@@ -4,4 +4,16 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable, :trackable
+
+  # Geocoder configuration
+  geocoded_by :city
+  after_validation :geocode, if: ->(obj){ obj.city.present? && obj.city_changed? }
+
+  # Validations
+  validates :username, presence: true, uniqueness: true, length: { minimum: 3, maximum: 30 }
+  validates :city, presence: true
+  validates :couple_type, presence: true, inclusion: { in: %w(homme femme) }
+
+  # Virtual attribute for sign up form
+  attr_accessor :terms_of_service
 end

@@ -1,29 +1,67 @@
-<h2>Sign up</h2>
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Inscription</h2>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      <div class="space-y-2">
+        <%= f.label :username, "Pseudo", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :username, autofocus: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, autocomplete: "email", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :city, "Ville", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :city, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :couple_type, "Vous êtes:", class: "block text-sm font-medium text-gray-700" %>
+        <div class="mt-1 space-x-4">
+          <label class="inline-flex items-center">
+            <%= f.radio_button :couple_type, 'homme', class: "form-radio" %>
+            <span class="ml-2">Couple</span>
+          </label>
+          <label class="inline-flex items-center">
+            <%= f.radio_button :couple_type, 'femme', class: "form-radio" %>
+            <span class="ml-2">Femme</span>
+          </label>
+          <label class="inline-flex items-center">
+            <%= f.radio_button :couple_type, 'femme', class: "form-radio" %>
+            <span class="ml-2">Homme</span>
+          </label>
+          <label class="inline-flex items-center">
+            <%= f.radio_button :couple_type, 'femme', class: "form-radio" %>
+            <span class="ml-2">Trans/Trav</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :password, "Mot de passe", class: "block text-sm font-medium text-gray-700" %>
+        <% if @minimum_password_length %>
+          <em class="text-xs text-gray-500">(<%= @minimum_password_length %> caractères minimum)</em>
+        <% end %>
+        <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :password_confirmation, "Confirmation du mot de passe", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+
+      <div class="pt-4">
+        <%= f.submit "S'inscrire", class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    <% end %>
+
+    <div class="mt-6">
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
