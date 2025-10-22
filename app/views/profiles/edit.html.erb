@@ -1,0 +1,33 @@
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-6">Modifier mon profil</h1>
+  <%= form_with model: @profile, local: true, html: { multipart: true, class: "space-y-4" } do |f| %>
+    <div>
+      <%= f.label :photo, "Photo de profil" %>
+      <%= f.file_field :photo, accept: "image/*" %>
+      <% if @profile.photo.attached? %>
+        <div class="mt-2"><%= image_tag url_for(@profile.photo), class: "h-32 rounded" %></div>
+      <% end %>
+    </div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 3, class: "w-full border rounded p-2" %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% [:age_f,:age_h,:cheveux_f,:cheveux_h,:fumeur_f,:fumeur_h,:origine_f,:origine_h,:pilosite_f,:pilosite_h,:poids_f,:poids_h,:prep_f,:prep_h,:profession_f,:profession_h,:signe_f,:signe_h,:silouhette_f,:silouhette_h,:taille_f,:taille_h,:tendance_f,:tendance_h,:type_user,:yeux_f,:yeux_h].each do |attr| %>
+        <div>
+          <%= f.label attr %>
+          <% if attr.to_s.include?("age") || attr.to_s.include?("poids") || attr.to_s.include?("taille") %>
+            <%= f.number_field attr, class: "w-full border rounded p-2" %>
+          <% elsif attr == :description %>
+            <%= f.text_area attr, rows: 3, class: "w-full border rounded p-2" %>
+          <% else %>
+            <%= f.text_field attr, class: "w-full border rounded p-2" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="pt-4">
+      <%= f.submit "Enregistrer", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

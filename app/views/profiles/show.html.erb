@@ -1,0 +1,21 @@
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4">Profil de <%= @profile.user.username %></h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <% if @profile.photo.attached? %>
+        <%= image_tag url_for(@profile.photo), class: "rounded shadow" %>
+      <% else %>
+        <div class="w-full h-48 bg-gray-100 flex items-center justify-center rounded">Aucune photo</div>
+      <% end %>
+    </div>
+    <div>
+      <p><strong>Description:</strong> <%= @profile.description %></p>
+      <!-- Ajoutez d'autres champs au besoin -->
+    </div>
+  </div>
+  <% if user_signed_in? && current_user == @profile.user %>
+    <div class="mt-6">
+      <%= link_to "Modifier le profil", edit_profile_path(@profile), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

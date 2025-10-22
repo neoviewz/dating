@@ -2,17 +2,19 @@
   <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Inscription</h2>
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4", data: { controller: 'registration', 'registration-username-url-value': validate_username_path, 'registration-email-url-value': validate_email_path } }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="space-y-2">
         <%= f.label :username, "Pseudo", class: "block text-sm font-medium text-gray-700" %>
-        <%= f.text_field :username, autofocus: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+  <%= f.text_field :username, autofocus: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500", data: { action: 'input->registration#validateUsername' , 'registration-target': 'username' } %>
+        <div data-registration-target="usernameFeedback" class="text-sm"></div>
       </div>
 
       <div class="space-y-2">
         <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.email_field :email, autocomplete: "email", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+  <%= f.email_field :email, autocomplete: "email", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500", data: { action: 'input->registration#validateEmail', 'registration-target': 'email' } %>
+        <div data-registration-target="emailFeedback" class="text-sm"></div>
       </div>
 
       <div class="space-y-2">
@@ -22,9 +24,9 @@
 
       <div class="space-y-2">
         <%= f.label :couple_type, "Vous êtes:", class: "block text-sm font-medium text-gray-700" %>
-        <div class="mt-1 space-x-4">
+        <div class="mt-1 grid grid-cols-2 gap-2">
           <label class="inline-flex items-center">
-            <%= f.radio_button :couple_type, 'homme', class: "form-radio" %>
+            <%= f.radio_button :couple_type, 'couple', class: "form-radio" %>
             <span class="ml-2">Couple</span>
           </label>
           <label class="inline-flex items-center">
@@ -32,11 +34,11 @@
             <span class="ml-2">Femme</span>
           </label>
           <label class="inline-flex items-center">
-            <%= f.radio_button :couple_type, 'femme', class: "form-radio" %>
+            <%= f.radio_button :couple_type, 'homme', class: "form-radio" %>
             <span class="ml-2">Homme</span>
           </label>
           <label class="inline-flex items-center">
-            <%= f.radio_button :couple_type, 'femme', class: "form-radio" %>
+            <%= f.radio_button :couple_type, 'trans_trav', class: "form-radio" %>
             <span class="ml-2">Trans/Trav</span>
           </label>
         </div>
@@ -47,7 +49,12 @@
         <% if @minimum_password_length %>
           <em class="text-xs text-gray-500">(<%= @minimum_password_length %> caractères minimum)</em>
         <% end %>
-        <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        <div class="relative">
+          <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pr-10", data: { 'registration-target': 'password' } %>
+          <button type="button" data-action="click->registration#togglePassword" data-registration-target="toggle" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700" aria-label="Afficher/Masquer">
+            👁
+          </button>
+        </div>
       </div>
 
       <div class="space-y-2">
@@ -65,3 +72,63 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Fallback realtime validation if Stimulus isn't active
+  (function(){
+    function debounce(fn, wait){
+      let t
+      return function(...args){
+        clearTimeout(t)
+        t = setTimeout(()=>fn.apply(this,args), wait)
+      }
+    }
+
+    const usernameInput = document.querySelector('[data-registration-target="username"]')
+    const usernameFeedback = document.querySelector('[data-registration-target="usernameFeedback"]')
+    const emailInput = document.querySelector('[data-registration-target="email"]')
+    const emailFeedback = document.querySelector('[data-registration-target="emailFeedback"]')
+
+    const validate = async (url, value, feedbackEl) => {
+      if(!value) { feedbackEl.textContent = ''; return }
+      try {
+        const res = await fetch(url + '?value=' + encodeURIComponent(value), { headers: { 'Accept': 'application/json' } })
+        if(!res.ok) throw new Error('network')
+        const json = await res.json()
+        feedbackEl.textContent = json.available ? 'Disponible' : 'Déjà pris'
+        feedbackEl.className = json.available ? 'text-green-600 text-sm' : 'text-red-600 text-sm'
+      } catch(e) {
+        feedbackEl.textContent = 'Erreur de validation'
+        feedbackEl.className = 'text-yellow-600 text-sm'
+      }
+    }
+
+    if(usernameInput && usernameFeedback){
+      const url = '<%= validate_username_path %>'
+      usernameInput.addEventListener('input', debounce(function(e){ validate(url, e.target.value.trim(), usernameFeedback) }, 300))
+    }
+    if(emailInput && emailFeedback){
+      const url = '<%= validate_email_path %>'
+      emailInput.addEventListener('input', debounce(function(e){ validate(url, e.target.value.trim(), emailFeedback) }, 300))
+    }
+  })();
+</script>
+
+  <script>
+    // Fallback: direct toggle if Stimulus does not handle click
+    (function(){
+      document.querySelectorAll('[data-registration-target="toggle"]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          try {
+            var container = btn.closest('.relative') || btn.parentElement
+            var input = container && container.querySelector('input[data-registration-target="password"]')
+            if(!input) return
+            input.type = input.type === 'password' ? 'text' : 'password'
+            btn.classList.toggle('opacity-50')
+          } catch(err) {
+            // ignore
+          }
+        })
+      })
+    })();
+  </script>
