@@ -75,3 +75,5 @@ end
 gem "devise", "~> 4.9"
 gem "geocoder"
 gem "friendly_id", "~> 5.5"
+gem 'psych', '< 5'
+gem 'nokogiri', '~> 1.16.0'
